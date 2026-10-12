@@ -10,6 +10,7 @@
 | --- | --- | --- | --- | --- |
 | 唐语歌 | 《夏日花火》 | [`skills/唐语歌-skill-main`](./skills/唐语歌-skill-main) | v2 | 高二前后，何曦铭的同桌、文学社成员（是否已任社长由用户指定） |
 | 满穗 | 《饿殍：明末千里行》 | [`skills/满穗-skill-main`](./skills/满穗-skill-main) | v2 | 洛阳湖边对峙之后（十四岁），可切换到其他四个阶段 |
+| 爱莉希雅 | 《崩坏3rd》 | [`skills/爱莉希雅-skill-main`](./skills/爱莉希雅-skill-main) | v1 | 往世乐土中的记忆体，迎接来访者；可切换到永世乐土坦白之后、黄金庭院 AU |
 
 ## 目录结构
 
@@ -46,7 +47,7 @@ git clone https://github.com/QianYan-Art/Character-skills.git
 ```bash
 git clone --filter=blob:none --sparse https://github.com/QianYan-Art/Character-skills.git
 cd Character-skills
-git sparse-checkout set "skills/唐语歌-skill-main"   # 或 "skills/满穗-skill-main"
+git sparse-checkout set "skills/唐语歌-skill-main"   # 或 "skills/满穗-skill-main"、"skills/爱莉希雅-skill-main"
 ```
 
 ### 2. 放入 Skill 目录
@@ -66,20 +67,21 @@ git sparse-checkout set "skills/唐语歌-skill-main"   # 或 "skills/满穗-ski
 | --- | --- | --- |
 | 唐语歌 | `tangyuge-perspective` | `/tangyuge-perspective [问题]`，或在对话中要求“以唐语歌的身份回答” |
 | 满穗 | `mansui-perspective` | `/mansui-perspective [问题]`，或在对话中要求“以满穗的身份回答” |
+| 爱莉希雅 | `elysia-perspective` | `/elysia-perspective [问题]`，或在对话中要求“以爱莉希雅的身份回答” |
 
 说“退出”“停止扮演”“切回正常模式”即可结束扮演。
 
 ## 制作方法
 
-v2 版本按 [GalgameCharacterSkills](https://github.com/JodieRuth/GalgameCharacterSkills) 的蒸馏流程制作，但**没有调用该项目的 LLM 接口**，每个步骤都由人工审阅原文完成：
+唐语歌、满穗的 v2 和爱莉希雅的 v1 都按 [GalgameCharacterSkills](https://github.com/JodieRuth/GalgameCharacterSkills) 的蒸馏流程制作，但**没有调用该项目的 LLM 接口**，每个步骤都由人工审阅原文完成：
 
-1. **语料**：使用从游戏中提取并清洗后的角色高相关剧情文本。唐语歌另外核对了全部 702 条本人台词，补查了未进入主语料的其他路线台词。
-2. **切片**：用上游项目的 `FileProcessor.slice_multiple_files`（50k token / 片，`cl100k_base`）切分。唐语歌 2 片，满穗 3 片。
+1. **语料**：使用从游戏中提取并清洗后的角色高相关剧情文本。唐语歌另外核对了全部 702 条本人台词，补查了未进入主语料的其他路线台词。爱莉希雅使用 12 个来源合并的全量语料（本人台词 9144 条），剧情类保留同场景上下文、去掉选项分支造成的重复行，语音与互动类按文本去重。
+2. **切片**：用上游项目的 `FileProcessor.slice_multiple_files`（50k token / 片，`cl100k_base`）切分。唐语歌 2 片，满穗 3 片，爱莉希雅 10 片。
 3. **逐片分析**：每一片都按上游的 PART A（客观事实）/ PART B（四层人格：身份锚点、表达风格、情绪与决策、行为规则）格式写成摘要，并附原文引用。
-4. **汇总与校正**：合并各片摘要，用后文揭示的真相修正前文的说法（例如满穗对外谎报的年龄、籍贯和身世）。
+4. **汇总与校正**：合并各片摘要，用后文揭示的真相修正前文的说法（例如满穗对外谎报的年龄、籍贯和身世，爱莉希雅“第十三律者”与“人之律者”的区别），并把非正史的活动 AU 单独标注。
 5. **生成 Skill**：按上游的七文件结构写成，另外加了 `world_context.md` 和 `quotes.md` 两份参考文档。
 
-### 与 v1 的主要差异
+### 唐语歌、满穗：v2 与 v1 的主要差异
 
 | 项目 | v1 | v2 |
 | --- | --- | --- |
@@ -91,9 +93,9 @@ v2 版本按 [GalgameCharacterSkills](https://github.com/JodieRuth/GalgameCharac
 
 ## 内容边界
 
-两位角色在原作的主要时期都是未成年人。为此，两个 Skill 都明确规定：
+唐语歌、满穗在原作的主要时期都是未成年人；爱莉希雅的年龄在作品中没有明确给出，她一贯自称“少女”，按年龄不明处理。为此，三个 Skill 都明确规定：
 
-- 不演绎任何恋爱、调情、亲密或性相关的互动。即使用户把时间设定改到成年以后，这条规定也不变。
+- 不演绎任何恋爱、调情、亲密或性相关的互动。即使用户把时间设定改到成年以后，这条规定也不变。爱莉希雅原作语音中对玩家的暧昧台词不作为扮演素材，她对用户的热情是朋友式的。
 - 不复现原作中儿童遭受伤害的情节，不渲染血腥与食人细节（《饿殍》）。
 - 用户提到自伤、轻生时，以安全为先，并给出现实中的求助建议。
 
@@ -101,7 +103,7 @@ v2 版本按 [GalgameCharacterSkills](https://github.com/JodieRuth/GalgameCharac
 
 ## 声明
 
-- 本仓库是非商业的同人整理。《夏日花火》《饿殍：明末千里行》及其中角色、剧情和台词的版权，归各自的原作权利人所有。
+- 本仓库是非商业的同人整理。《夏日花火》《饿殍：明末千里行》《崩坏3rd》及其中角色、剧情和台词的版权，归各自的原作权利人所有。
 - `quotes.md` 只收录用于校准口吻的短句，不提供剧本全文。
 - 蒸馏流程参考了 [GalgameCharacterSkills](https://github.com/JodieRuth/GalgameCharacterSkills)（MIT License）。
 - 如果权利人认为某些内容不宜公开，请提交 Issue，我们会及时处理。
